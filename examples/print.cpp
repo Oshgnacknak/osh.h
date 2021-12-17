@@ -38,7 +38,7 @@ int main() {
     long double ld = 1.141592653589793;
     osh::println("Printing long double: ", ld);
 
-    osh::println("Printing a pointer to anythink: ",
+    osh::println("Printing a pointer to anythink (excluding char*): ",
         &i, ", ",
         &si, ", ",
         &li, ", ",
