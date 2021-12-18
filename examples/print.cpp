@@ -59,6 +59,7 @@ int main() {
 
     Vector2 v = { 69, 420 };
     osh::println("Printing costume types (see print1 above): ", v);
+    osh::println("^ Comment it out, error message is ACTUALLY readable");
 
     return 0; 
 }

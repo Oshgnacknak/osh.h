@@ -4,9 +4,11 @@
 namespace osh {
 
     template<typename T>
-    void print1(T& t);
+    concept IsPrintable = requires(T t) {
+        print1(t);
+    };
 
-    template<typename... Args>
+    template<IsPrintable... Args>
     void print(Args... args);
 
     template<typename... Args>
@@ -30,39 +32,39 @@ namespace osh {
     }
 
     template<typename T>
-    void print1(T* p) {
+    void print1(const T* p) {
         printf("%p", p);
     }
 
-    void print1(char& c) {
+    void print1(const char& c) {
         putchar(c);
     }
 
-    void print1(int& n) {
+    void print1(const int& n) {
         printf("%d", n);
     }
 
-    void print1(short int& n) {
+    void print1(const short int& n) {
         printf("%d", n);
     }
 
-    void print1(long int& n) {
+    void print1(const long int& n) {
         printf("%ld", n);
     }
 
-    void print1(long long int& n) {
+    void print1(const long long int& n) {
         printf("%lld", n);
     }
 
-    void print1(float& f) {
+    void print1(const float& f) {
         printf("%f", f);
     }
 
-    void print1(double& d) {
+    void print1(const double& d) {
         printf("%f", d);
     }
 
-    void print1(long double& d) {
+    void print1(const long double& d) {
         printf("%Lf", d);
     }
 
