@@ -53,8 +53,8 @@ int main() {
     buf[2] = 'f';
     buf[3] = 'f';
     buf[4] = 'e';
-    buf[4] = 'r';
-    buf[5] = '\0';
+    buf[5] = 'r';
+    buf[6] = '\0';
     osh::println("Printing char buffers: ", buf);
 
     Vector2 v = { 69, 420 };
