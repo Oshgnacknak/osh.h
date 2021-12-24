@@ -5,12 +5,12 @@ struct Vector2 {
     double x, y;
 };
 
-void print1(Vector2& v) {
-    osh::print("Vector2(", v.x, ", ", v.y, ')');
+template<typename P>
+void print1(P p, Vector2& v) {
+    osh::printp(p, "Vector2(", v.x, ", ", v.y, ')');
 }
 
 int main() {
-
     osh::println("Concatinating different data types:",
         '-', 5, 6.0d, 9, '+', 'L');
 
@@ -61,5 +61,5 @@ int main() {
     osh::println("Printing costume types (see print1 above): ", v);
     osh::println("^ Comment it out, error message is ACTUALLY readable");
 
-    return 0; 
+    return 0;
 }
