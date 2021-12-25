@@ -61,5 +61,7 @@ int main() {
     osh::println("Printing costume types (see print1 above): ", v);
     osh::println("^ Comment it out, error message is ACTUALLY readable");
 
+    osh::printp(stderr, "Printing to any FILE* other than stdout: ", buf, " - ", v, '\n');
+
     return 0;
 }

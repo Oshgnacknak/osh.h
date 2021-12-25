@@ -48,6 +48,8 @@ namespace osh {
     void print1(Formatter auto&, const double&);
     void print1(Formatter auto&, const long double&);
 
+    template<typename T>
+    void print1(FILE* stream, const T& t);
 }
 
 #endif /* OSH_H */
@@ -125,6 +127,12 @@ namespace osh {
     template<typename... Args>
     void FileFormatter::format(const char* fmt, Args... args) {
         fprintf(stream, fmt, args...);
+    }
+
+    template<typename T>
+    void print1(FILE* stream, const T& t) {
+        FileFormatter fmt(stream);
+        print1(fmt, t);
     }
 
 }
