@@ -2,6 +2,7 @@
 #define OSH_H 
 
 #include <stdio.h>
+#include <stdarg.h>
 
 namespace osh {
 
@@ -10,25 +11,41 @@ namespace osh {
         print1(p, t);
     };
 
+    template<typename T>
+    concept Formatter = requires(T t) {
+        t.format("%s: %d\n", "Namespace", 123);
+    };
+
+    class FileFormatter {
+        FILE* stream;
+
+        public:
+        FileFormatter(FILE* stream);
+        void format(const char* fmt, ...);
+    };
+
+    extern FileFormatter fout;
+    extern FileFormatter ferr;
+
     template<typename P, PrintableTo<P>... Args>
     void printp(P& p, Args...);
 
-    template<PrintableTo<FILE*>... Args>
+    template<PrintableTo<Formatter>... Args>
     void print(Args...);
-    template<PrintableTo<FILE*>... Args>
+    template<PrintableTo<Formatter>... Args>
     void println(Args... args);
 
-    void print1(FILE*, const char*);
-    void print1(FILE*, char*);
-    template<typename T> void print1(FILE*, const T*);
-    void print1(FILE*, const char&);
-    void print1(FILE*, const int&);
-    void print1(FILE*, const short int&);
-    void print1(FILE*, const long int&);
-    void print1(FILE*, const long long int&);
-    void print1(FILE*, const float&);
-    void print1(FILE*, const double&);
-    void print1(FILE*, const long double&);
+    void print1(Formatter auto&, const char*);
+    void print1(Formatter auto&, char*);
+    template<typename T> void print1(Formatter auto&, const T*);
+    void print1(Formatter auto&, const char&);
+    void print1(Formatter auto&, const int&);
+    void print1(Formatter auto&, const short int&);
+    void print1(Formatter auto&, const long int&);
+    void print1(Formatter auto&, const long long int&);
+    void print1(Formatter auto&, const float&);
+    void print1(Formatter auto&, const double&);
+    void print1(Formatter auto&, const long double&);
 
 }
 
@@ -38,49 +55,49 @@ namespace osh {
 
 namespace osh {
 
-    void print1(FILE* stream, const char* s) {
-        fputs(s, stream);
+    void print1(Formatter auto& fmt, const char* s) {
+        fmt.format("%s", s);
     }
 
-    void print1(FILE* stream, char* s) {
-        fputs(s, stream);
+    void print1(Formatter auto& fmt, char* s) {
+        fmt.format("%s", s);
     }
 
     template<typename T>
-    void print1(FILE* stream, const T* p) {
-        fprintf(stream, "%p", p);
+    void print1(Formatter auto& fmt, const T* p) {
+        fmt.format("%p", p);
     }
 
-    void print1(FILE* stream, const char& c) {
-        fputc(c, stream);
+    void print1(Formatter auto& fmt, const char& c) {
+        fmt.format("%c", c);
     }
 
-    void print1(FILE* stream, const int& n) {
-        fprintf(stream, "%d", n);
+    void print1(Formatter auto& fmt, const int& n) {
+        fmt.format("%d", n);
     }
 
-    void print1(FILE* stream, const short int& n) {
-        fprintf(stream, "%d", n);
+    void print1(Formatter auto& fmt, const short int& n) {
+        fmt.format("%d", n);
     }
 
-    void print1(FILE* stream, const long int& n) {
-        fprintf(stream, "%ld", n);
+    void print1(Formatter auto& fmt, const long int& n) {
+        fmt.format("%ld", n);
     }
 
-    void print1(FILE* stream, const long long int& n) {
-        fprintf(stream, "%lld", n);
+    void print1(Formatter auto& fmt, const long long int& n) {
+        fmt.format("%lld", n);
     }
 
-    void print1(FILE* stream, const float& f) {
-        fprintf(stream, "%f", f);
+    void print1(Formatter auto& fmt, const float& f) {
+        fmt.format("%f", f);
     }
 
-    void print1(FILE* stream, const double& d) {
-        fprintf(stream, "%f", d);
+    void print1(Formatter auto& fmt, const double& d) {
+        fmt.format("%f", d);
     }
 
-    void print1(FILE* stream, const long double& d) {
-        fprintf(stream, "%Lf", d);
+    void print1(Formatter auto& fmt, const long double& d) {
+        fmt.format("%Lf", d);
     }
 
     template<typename P, typename... Args>
@@ -90,12 +107,26 @@ namespace osh {
 
     template<typename... Args>
     void print(Args... args) {
-        printp(stdout, args...);
+        printp(fout, args...);
     }
 
     template<typename... Args>
     void println(Args... args) {
-        printp(stdout, args..., '\n');
+        printp(fout, args..., '\n');
+    }
+
+    FileFormatter fout(stdout);
+    FileFormatter ferr(stderr);
+
+    FileFormatter::FileFormatter(FILE* stream)
+        : stream(stream) {}
+
+    void FileFormatter::format(const char* fmt, ...) {
+        va_list ap;
+        va_start(ap, fmt);
+
+        vfprintf(stream, fmt, ap);
+        va_end(ap);
     }
 
 }
