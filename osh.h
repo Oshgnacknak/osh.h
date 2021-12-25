@@ -2,7 +2,6 @@
 #define OSH_H 
 
 #include <stdio.h>
-#include <stdarg.h>
 
 namespace osh {
 
@@ -21,7 +20,9 @@ namespace osh {
 
         public:
         FileFormatter(FILE* stream);
-        void format(const char* fmt, ...);
+
+        template<typename... Args>
+        void format(const char* fmt, Args...);
     };
 
     extern FileFormatter fout;
@@ -121,12 +122,9 @@ namespace osh {
     FileFormatter::FileFormatter(FILE* stream)
         : stream(stream) {}
 
-    void FileFormatter::format(const char* fmt, ...) {
-        va_list ap;
-        va_start(ap, fmt);
-
-        vfprintf(stream, fmt, ap);
-        va_end(ap);
+    template<typename... Args>
+    void FileFormatter::format(const char* fmt, Args... args) {
+        fprintf(stream, fmt, args...);
     }
 
 }
