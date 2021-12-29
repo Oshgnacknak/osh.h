@@ -5,6 +5,12 @@
 
 namespace osh {
 
+    template<typename T>
+    T min(T a, T b);
+    
+    template<typename T>
+    T max(T a, T b);
+    
     template<typename P, typename T>
     concept PrintableTo = requires(P p, T t) {
         print1(p, t);
@@ -50,13 +56,28 @@ namespace osh {
 
     template<typename T>
     void print1(FILE* stream, const T& t);
+
+    template<PrintableTo<Formatter>... Args>
+    [[noreturn]] void panic(Args... args);
 }
 
 #endif /* OSH_H */
 
 #ifdef OSH_H_IMPLEMENTATION
 
+#include <stdlib.h>
+
 namespace osh {
+
+    template<typename T>
+    T min(T a, T b) {
+        return a < b ? a : b;
+    }
+
+    template<typename T>
+    T max(T a, T b) {
+        return a > b ? a : b;
+    }
 
     void print1(Formatter auto& fmt, const char* s) {
         fmt.format("%s", s);
@@ -135,6 +156,11 @@ namespace osh {
         print1(fmt, t);
     }
 
+    template<typename... Args>
+    void panic(Args... args) {
+        printp(ferr, args...);
+        exit(1);
+    }
 }
 
 #endif // OSH_H_IMPLEMENTATION
