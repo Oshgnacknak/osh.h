@@ -84,6 +84,30 @@ namespace osh {
 
     template<Destructible T>
     AutoDestruct<T> autoDestruct(T t);
+
+    class StringBuffer {
+        char* data;
+        int _size = 0;
+        int capacity;
+    public:
+        StringBuffer(int = 10);
+        StringBuffer(const char*);
+        void destruct();
+        int size() const;
+        char* cstr() const;
+        template<typename... Args> void format(const char* fmt, Args&&...);
+        void ensureCapacity(int);
+        StringBuffer substr(const int& begin, const int& end) const;
+        void clear();
+        char& operator[](const int& index);
+        StringBuffer& operator+=(const char&);
+    };
+
+    template<typename T>
+    void checkIndex(const T& index, const T& size);
+
+    void print1(Formatter auto&, const StringBuffer&);
+
     template<typename T>
     void swap(T& a, T& b);
 }
@@ -93,6 +117,7 @@ namespace osh {
 #ifdef OSH_H_IMPLEMENTATION
 
 #include <stdlib.h>
+#include <string.h>
 
 namespace osh {
 
@@ -237,6 +262,86 @@ namespace osh {
     AutoDestruct<T> autoDestruct(T t) {
         return (AutoDestruct<T>) t;
     }
+
+    StringBuffer::StringBuffer(int capacity) : capacity(capacity) {
+        data = (char*) malloc(capacity);
+        if (capacity > 0) {
+            data[0] = '\0';
+        }
+    }
+
+    StringBuffer::StringBuffer(const char* data) : StringBuffer(strlen(data)) {
+        _size = capacity;
+        memcpy(this->data, data, _size);
+    }
+
+    int StringBuffer::size() const {
+        return _size;
+    }
+
+    char* StringBuffer::cstr() const {
+        return data;
+    }
+
+    StringBuffer StringBuffer::substr(const int& begin, const int& end) const {
+        checkIndex(begin, _size);
+        checkIndex(end, _size);
+        assert(begin < end);
+
+        StringBuffer s(end - begin);
+        memcpy(s.data, data, s._size);
+
+        return s;
+    }
+
+    template<typename... Args>
+    void StringBuffer::format(const char* fmt, Args&&... args) {
+        int required = 1 + snprintf(nullptr, 0, fmt, args...);
+        ensureCapacity(required);
+        snprintf(data + _size, required, fmt, args...);
+        _size += required;
+    }
+
+    void StringBuffer::ensureCapacity(int required) {
+        capacity = max(capacity *= 2, _size + required);
+        data = (char*) realloc(data, capacity);
+    }
+
+    void StringBuffer::clear() {
+        _size = 0;
+        if (capacity > 0) {
+            data[_size] = '\0';
+        }
+    }
+
+    void StringBuffer::destruct() {
+        if (data != nullptr) {
+            free(data);
+        }
+    }
+
+    char& StringBuffer::operator[](const int& index) {
+        checkIndex(index, capacity);
+        return data[index];
+    }
+
+    StringBuffer& StringBuffer::operator+=(const char& c) {
+        ensureCapacity(1);
+        data[_size++] = c;
+        data[_size] = '\0';
+        return *this;
+    }
+
+    void print1(Formatter auto& fmt, const StringBuffer& s) {
+        printp(fmt, s.cstr());
+    }
+
+    template<typename T>
+    void checkIndex(const T& index, const T& size) {
+        assert(index >= 0 && index < size,
+            "Index", index, "out of bounce");
+    }
+
     template<typename T>
     void swap(T& a, T& b) {
         T t = a;
