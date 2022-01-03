@@ -18,7 +18,7 @@ namespace osh {
 
     template<typename T>
     concept Formatter = requires(T t) {
-        t.format("%s: %d\n", "Namespace", 123);
+        t.format("If it supports %s, it suppots %p!!1%d!elf", "printf", "printp", 1);
     };
 
     class FileFormatter {
