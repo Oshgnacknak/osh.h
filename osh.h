@@ -28,7 +28,7 @@ namespace osh {
         FileFormatter(FILE* stream);
 
         template<typename... Args>
-        void format(const char* fmt, Args...);
+        void format(const char* fmt, Args&&...);
         void flush();
     };
 
@@ -41,7 +41,7 @@ namespace osh {
     template<PrintableTo<Formatter>... Args>
     void print(Args...);
     template<PrintableTo<Formatter>... Args>
-    void println(Args... args);
+    void println(Args&&... args);
 
     void print1(Formatter auto&, const char*);
     void print1(Formatter auto&, char*);
@@ -64,7 +64,10 @@ namespace osh {
     void print1(FILE* stream, const T& t);
 
     template<PrintableTo<Formatter>... Args>
-    [[noreturn]] void panic(Args... args);
+    [[noreturn]] void panic(Args&&... args);
+
+    template<typename... Args>
+    void assert(bool condition, Args&&... args);
 }
 
 #endif /* OSH_H */
@@ -151,17 +154,17 @@ namespace osh {
     }
 
     template<typename P, typename... Args>
-    void printp(P& p, Args... args) {
+    void printp(P& p, Args&&... args) {
         (print1(p, args), ...);
     }
 
     template<typename... Args>
-    void print(Args... args) {
+    void print(Args&&... args) {
         printp(fout, args...);
     }
 
     template<typename... Args>
-    void println(Args... args) {
+    void println(Args&&... args) {
         printp(fout, args..., '\n');
     }
 
@@ -172,7 +175,7 @@ namespace osh {
         : stream(stream) {}
 
     template<typename... Args>
-    void FileFormatter::format(const char* fmt, Args... args) {
+    void FileFormatter::format(const char* fmt, Args&&... args) {
         fprintf(stream, fmt, args...);
     }
 
@@ -187,9 +190,20 @@ namespace osh {
     }
 
     template<typename... Args>
-    void panic(Args... args) {
+    void panic(Args&&... args) {
         printp(ferr, args...);
         exit(1);
+    }
+
+    template<typename... Args>
+    void assert(bool condition, Args&&... args) {
+        if (!condition) {
+            if (sizeof...(Args) > 0) {
+                panic(args...);
+            } else {
+                panic("Assertion failed");
+            }
+        }
     }
 }
 
