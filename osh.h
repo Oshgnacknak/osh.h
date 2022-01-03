@@ -29,6 +29,7 @@ namespace osh {
 
         template<typename... Args>
         void format(const char* fmt, Args...);
+        void flush();
     };
 
     extern FileFormatter fout;
@@ -179,6 +180,10 @@ namespace osh {
     void print1(FILE* stream, const T& t) {
         FileFormatter fmt(stream);
         print1(fmt, t);
+    }
+
+    void FileFormatter::flush() {
+       fflush(stream);
     }
 
     template<typename... Args>
