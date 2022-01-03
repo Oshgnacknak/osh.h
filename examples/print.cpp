@@ -1,44 +1,61 @@
 #define OSH_H_IMPLEMENTATION
 #include "osh.h"
 
+using namespace osh;
+
 struct Vector2 {
     double x, y;
 };
 
 template<typename P>
 void print1(P p, Vector2& v) {
-    osh::printp(p, "Vector2(", v.x, ", ", v.y, ')');
+    printp(p, "Vector2(", v.x, ", ", v.y, ')');
 }
 
 int main() {
-    osh::println("Concatinating different data types:",
+    println("Concatinating different data types:",
         '-', 5, 6.0d, 9, '+', 'L');
 
     char c = 'A';
-    osh::println("Printing char: ", c);
+    println("Printing char: ", c);
 
     int i = 69;
-    osh::println("Printing int: ", i);
+    println("Printing int: ", i);
         
     short int si = 420;
-    osh::println("Printing short int: ", si);
+    println("Printing short int: ", si);
         
     long int li = 666;
-    osh::println("Printing long int: ", li);
+    println("Printing long int: ", li);
         
     long long int lli = 0xdeadbeef;
-    osh::println("Printing long long int: ", lli);
+    println("Printing long long int: ", lli);
+
+    unsigned char uc = 'E';
+    println("Printing unsigned char: ", uc);
+    
+    unsigned int ui = 1337;
+    println("Printing unsigned int: ", ui);
+    
+    unsigned short int usi = 25565;
+    println("Printing unsigned short int: ", usi);
+    
+    unsigned long int uli = 0xadbdef;
+    println("Printing unsigned long int: ", uli);
+    
+    unsigned long long int ulli = 987665543210;
+    println("Printing unsigned long long int: ", ulli);
         
     float f = 3.141592653589793;
-    osh::println("Printing float: ", f);
+    println("Printing float: ", f);
         
     double d = 2.71828;
-    osh::println("Printing double: ", d);
+    println("Printing double: ", d);
 
     long double ld = 1.141592653589793;
-    osh::println("Printing long double: ", ld);
+    println("Printing long double: ", ld);
 
-    osh::println("Printing a pointer to anythink (excluding char*): ",
+    println("Printing a pointer to anythink (excluding char*): ",
         &i, ", ",
         &si, ", ",
         &li, ", ",
@@ -55,13 +72,13 @@ int main() {
     buf[4] = 'e';
     buf[5] = 'r';
     buf[6] = '\0';
-    osh::println("Printing char buffers: ", buf);
+    println("Printing char buffers: ", buf);
 
     Vector2 v = { 69, 420 };
-    osh::println("Printing costume types (see print1 above): ", v);
-    osh::println("^ Comment it out, error message is ACTUALLY readable");
+    println("Printing costume types (see print1 above): ", v);
+    println("^ Comment it out, error message is ACTUALLY readable");
 
-    osh::printp(stderr, "Printing to any FILE* other than stdout: ", buf, " - ", v, '\n');
+    printp(stderr, "Printing to any FILE* other than stdout: ", buf, " - ", v, '\n');
 
     return 0;
 }

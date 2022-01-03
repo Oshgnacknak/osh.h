@@ -10,7 +10,7 @@ namespace osh {
     
     template<typename T>
     T max(T a, T b);
-    
+
     template<typename P, typename T>
     concept PrintableTo = requires(P p, T t) {
         print1(p, t);
@@ -50,6 +50,11 @@ namespace osh {
     void print1(Formatter auto&, const short int&);
     void print1(Formatter auto&, const long int&);
     void print1(Formatter auto&, const long long int&);
+    void print1(Formatter auto&, const unsigned char&);
+    void print1(Formatter auto&, const unsigned int&);
+    void print1(Formatter auto&, const unsigned short int&);
+    void print1(Formatter auto&, const unsigned long int&);
+    void print1(Formatter auto&, const unsigned long long int&);
     void print1(Formatter auto&, const float&);
     void print1(Formatter auto&, const double&);
     void print1(Formatter auto&, const long double&);
@@ -110,6 +115,26 @@ namespace osh {
 
     void print1(Formatter auto& fmt, const long long int& n) {
         fmt.format("%lld", n);
+    }
+
+    void print1(Formatter auto& fmt, const unsigned char& c) {
+        printp(fmt, (char) c);
+    }
+
+    void print1(Formatter auto& fmt, const unsigned int& n) {
+        fmt.format("%u", n);
+    }
+
+    void print1(Formatter auto& fmt, const unsigned short int& n) {
+        fmt.format("%u", n);
+    }
+
+    void print1(Formatter auto& fmt, const unsigned long int& n) {
+        fmt.format("%lu", n);
+    }
+
+    void print1(Formatter auto& fmt, const unsigned long long int& n) {
+        fmt.format("%llu", n);
     }
 
     void print1(Formatter auto& fmt, const float& f) {
