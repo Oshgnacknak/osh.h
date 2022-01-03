@@ -70,6 +70,21 @@ namespace osh {
     void assert(bool condition, Args&&... args);
 
     template<typename T>
+    concept Destructible = requires(T t) {
+        t.destruct();
+    };
+
+    template<Destructible T>
+    struct AutoDestruct : public T {
+        template<typename... Args>
+        AutoDestruct(Args&&... args);
+
+        ~AutoDestruct();
+    };
+
+    template<Destructible T>
+    AutoDestruct<T> autoDestruct(T t);
+    template<typename T>
     void swap(T& a, T& b);
 }
 
@@ -209,6 +224,19 @@ namespace osh {
         }
     }
 
+    template<typename T>
+    template<typename... Args>
+    AutoDestruct<T>::AutoDestruct(Args&&... args) : T(args...) {}
+
+    template<Destructible T>
+    AutoDestruct<T>::~AutoDestruct() {
+        this->destruct();
+    }
+
+    template<Destructible T>
+    AutoDestruct<T> autoDestruct(T t) {
+        return (AutoDestruct<T>) t;
+    }
     template<typename T>
     void swap(T& a, T& b) {
         T t = a;
