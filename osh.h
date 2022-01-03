@@ -130,7 +130,7 @@ namespace osh {
     }
 
     void print1(Formatter auto& fmt, const unsigned short int& n) {
-        fmt.format("%u", n);
+        fmt.format("%lu", n);
     }
 
     void print1(Formatter auto& fmt, const unsigned long int& n) {
