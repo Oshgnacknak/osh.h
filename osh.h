@@ -68,6 +68,9 @@ namespace osh {
 
     template<typename... Args>
     void assert(bool condition, Args&&... args);
+
+    template<typename T>
+    void swap(T& a, T& b);
 }
 
 #endif /* OSH_H */
@@ -204,6 +207,13 @@ namespace osh {
                 panic("Assertion failed");
             }
         }
+    }
+
+    template<typename T>
+    void swap(T& a, T& b) {
+        T t = a;
+        a = b;
+        b = t;
     }
 }
 
