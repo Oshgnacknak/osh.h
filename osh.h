@@ -177,7 +177,7 @@ namespace osh {
     }
 
     void print1(Formatter auto& fmt, const unsigned long int& n) {
-        fmt.format("%lu", n);
+        fmt.format("%llu", n);
     }
 
     void print1(Formatter auto& fmt, const unsigned long long int& n) {
