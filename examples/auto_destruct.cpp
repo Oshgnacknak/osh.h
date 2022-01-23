@@ -1,4 +1,3 @@
-#define OSH_H_IMPLEMENTATION
 #include "osh.h"
 
 using namespace osh;
@@ -43,3 +42,6 @@ int main() {
 
     return 0; 
 }
+
+#define OSH_H_IMPLEMENTATION
+#include "osh.h"
