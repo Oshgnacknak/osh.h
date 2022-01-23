@@ -1,4 +1,4 @@
-CXXFLAGS := -std=c++20 -fno-exceptions -I.
+CXXFLAGS := -ggdb -std=c++20 -fno-exceptions -I.
 
 EXAMPLES := $(subst .cpp,,$(wildcard examples/*.cpp))
 

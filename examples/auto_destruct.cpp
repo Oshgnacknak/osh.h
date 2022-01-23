@@ -18,7 +18,9 @@ struct V1 {
 
 int main() {
     {
-        AutoDestruct<StringBuffer> a = "Hallo";
+        StringBuffer a = "Hello";
+        auto destroyA = autoDestruct(a);
+
         println("AutoDestruct created: ", a);
 
         StringBuffer b = a;
