@@ -11,7 +11,8 @@ void print1(Formatter auto& fmt, Vector2& v) {
 }
 
 int main() {
-    println("Hallo, Welt");
+    print("Hallo, Welt -");
+    println(" Hello, World!");
     
     println("Concatinating different data types:",
         '-', 5, 6.0d, 9, '+', 'L');
@@ -78,7 +79,8 @@ int main() {
     println("Printing costume types (see print1 above): ", v);
     println("^ Comment it out, error message is ACTUALLY readable");
 
-    printp(ferr, "Printing to stderr: ", "you error is soos ", d, f, '\n');
+    eprint("Printing to stderr: ", "you error is soos ", d, f);
+    eprintln(" and here some saas");
 
     FileFormatter fmt(stderr);
     printp(fmt, "Printing to any FILE* other than stdout: ", buf, " - ", v, '\n');

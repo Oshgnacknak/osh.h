@@ -43,6 +43,11 @@ namespace osh {
     template<PrintableTo<FileFormatter>... Args>
     void println(Args&&...);
 
+    template<PrintableTo<FileFormatter>... Args>
+    void eprint(Args&&...);
+    template<PrintableTo<FileFormatter>... Args>
+    void eprintln(Args&&...);
+
     void print1(Formatter auto&, const char*);
     void print1(Formatter auto&, char*);
     template<typename T> void print1(Formatter auto&, const T*);
@@ -206,6 +211,16 @@ namespace osh {
     template<PrintableTo<FileFormatter>... Args>
     void println(Args&&... args) {
         printp(fout, args..., '\n');
+    }
+
+    template<PrintableTo<FileFormatter>... Args>
+    void eprint(Args&&... args) {
+        printp(ferr, args...);
+    }
+
+    template<PrintableTo<FileFormatter>... Args>
+    void eprintln(Args&&... args) {
+        printp(ferr, args..., '\n');
     }
 
     FileFormatter fout(stdout);
