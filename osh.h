@@ -11,8 +11,8 @@ namespace osh {
     template<typename T>
     T max(T a, T b);
 
-    template<typename P, typename T>
-    concept PrintableTo = requires(P p, T t) {
+    template<typename T, typename P>
+    concept PrintableTo = requires(T t, P p) {
         print1(p, t);
     };
 
@@ -36,12 +36,12 @@ namespace osh {
     extern FileFormatter ferr;
 
     template<typename P, PrintableTo<P>... Args>
-    void printp(P& p, Args...);
+    void printp(P&, Args...);
 
-    template<PrintableTo<Formatter>... Args>
-    void print(Args...);
-    template<PrintableTo<Formatter>... Args>
-    void println(Args&&... args);
+    template<PrintableTo<FileFormatter>... Args>
+    void print(Args&&...);
+    template<PrintableTo<FileFormatter>... Args>
+    void println(Args&&...);
 
     void print1(Formatter auto&, const char*);
     void print1(Formatter auto&, char*);
@@ -60,10 +60,7 @@ namespace osh {
     void print1(Formatter auto&, const double&);
     void print1(Formatter auto&, const long double&);
 
-    template<typename T>
-    void print1(FILE* stream, const T& t);
-
-    template<PrintableTo<Formatter>... Args>
+    template<PrintableTo<FileFormatter>... Args>
     [[noreturn]] void panic(Args&&... args);
 
     template<typename... Args>
@@ -196,17 +193,17 @@ namespace osh {
         fmt.format("%Lf", d);
     }
 
-    template<typename P, typename... Args>
-    void printp(P& p, Args&&... args) {
+    template<typename P, PrintableTo<P>... Args>
+    void printp(P& p, Args... args) {
         (print1(p, args), ...);
     }
 
-    template<typename... Args>
+    template<PrintableTo<FileFormatter>... Args>
     void print(Args&&... args) {
         printp(fout, args...);
     }
 
-    template<typename... Args>
+    template<PrintableTo<FileFormatter>... Args>
     void println(Args&&... args) {
         printp(fout, args..., '\n');
     }
@@ -222,17 +219,11 @@ namespace osh {
         fprintf(stream, fmt, args...);
     }
 
-    template<typename T>
-    void print1(FILE* stream, const T& t) {
-        FileFormatter fmt(stream);
-        print1(fmt, t);
-    }
-
     void FileFormatter::flush() {
        fflush(stream);
     }
 
-    template<typename... Args>
+    template<PrintableTo<FileFormatter>... Args>
     void panic(Args&&... args) {
         printp(ferr, args...);
         exit(1);

@@ -1,4 +1,3 @@
-#define OSH_H_IMPLEMENTATION
 #include "osh.h"
 
 using namespace osh;
@@ -7,12 +6,13 @@ struct Vector2 {
     double x, y;
 };
 
-template<typename P>
-void print1(P p, Vector2& v) {
-    printp(p, "Vector2(", v.x, ", ", v.y, ')');
+void print1(Formatter auto& fmt, Vector2& v) {
+    printp(fmt, "Vector2(", v.x, ", ", v.y, ')');
 }
 
 int main() {
+    println("Hallo, Welt");
+    
     println("Concatinating different data types:",
         '-', 5, 6.0d, 9, '+', 'L');
 
@@ -78,7 +78,13 @@ int main() {
     println("Printing costume types (see print1 above): ", v);
     println("^ Comment it out, error message is ACTUALLY readable");
 
-    printp(stderr, "Printing to any FILE* other than stdout: ", buf, " - ", v, '\n');
+    printp(ferr, "Printing to stderr: ", "you error is soos ", d, f, '\n');
+
+    FileFormatter fmt(stderr);
+    printp(fmt, "Printing to any FILE* other than stdout: ", buf, " - ", v, '\n');
 
     return 0;
 }
+
+#define OSH_H_IMPLEMENTATION
+#include "osh.h"
