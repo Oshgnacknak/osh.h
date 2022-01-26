@@ -78,6 +78,22 @@ namespace osh {
         ~AutoDestruct();
     };
 
+    template<typename T>
+    class DArray {
+    protected:
+        T* elements;
+        size_t size_ = 0;
+        size_t capacity;
+    public:
+        DArray(size_t = 10);
+        void destruct();
+        size_t size() const;
+        void ensureCapacity(size_t);
+        void push(const T&);
+        void clear();
+        T& operator[](ssize_t);
+    };
+
     template<Destructible T>
     AutoDestruct<T> autoDestruct(T t);
 
@@ -265,16 +281,54 @@ namespace osh {
         data = (char*) malloc(capacity);
         if (capacity > 0) {
             data[0] = '\0';
+
+    template<typename T>
+    DArray<T>::DArray(size_t capacity) : capacity(capacity) {
+        elements = (T*) malloc(sizeof(T) * capacity);
+    }
+
+    template<typename T>
+    void DArray<T>::destruct() {
+        if (elements != nullptr) {
+            free(elements);
+        }
+    }
+
+    template<typename T>
+    size_t DArray<T>::size() const {
+        return size_;
+    }
+
+    template<typename T>
+    void DArray<T>::ensureCapacity(size_t required) {
+        if (size_ + required >= capacity) {
+            capacity = max(capacity *= 2, size_ + required);
+            elements = (T*) realloc(elements, sizeof(T) * capacity);
         }
     }
 
     StringBuffer::StringBuffer(const char* data) : StringBuffer(strlen(data)) {
         _size = capacity;
         memcpy(this->data, data, _size);
+    template<typename T>
+    void DArray<T>::push(const T& t) {
+        ensureCapacity(1);
+        elements[size_++] = t;
+    }
+
+    template<typename T>
+    void DArray<T>::clear() {
+        size_ = 0;
     }
 
     int StringBuffer::size() const {
         return _size;
+    template<typename T>
+    T& DArray<T>::operator[](ssize_t index) {
+        index = listIndex(index, size_);
+        return elements[index];
+    }
+
     }
 
     char* StringBuffer::cstr() const {
