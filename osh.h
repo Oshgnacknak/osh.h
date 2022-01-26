@@ -5,12 +5,6 @@
 
 namespace osh {
 
-    template<typename T>
-    T min(T a, T b);
-    
-    template<typename T>
-    T max(T a, T b);
-
     template<typename T, typename P>
     concept PrintableTo = requires(T t, P p) {
         print1(p, t);
@@ -110,8 +104,16 @@ namespace osh {
 
     void print1(Formatter auto&, const StringBuffer&);
 
+    int listIndex(int index, const int& size);
+
     template<typename T>
     void swap(T& a, T& b);
+
+    template<typename T>
+    T min(T a, T b);
+    
+    template<typename T>
+    T max(T a, T b);
 }
 
 #endif /* OSH_H */
@@ -122,16 +124,6 @@ namespace osh {
 #include <string.h>
 
 namespace osh {
-
-    template<typename T>
-    T min(T a, T b) {
-        return a < b ? a : b;
-    }
-
-    template<typename T>
-    T max(T a, T b) {
-        return a > b ? a : b;
-    }
 
     void print1(Formatter auto& fmt, const char* s) {
         fmt.format("%s", s);
@@ -345,7 +337,16 @@ namespace osh {
     template<typename T>
     void checkIndex(const T& index, const T& size) {
         assert(index >= 0 && index < size,
+
+    int listIndex(int index, const int& size) {
+        assert(index >= -size && index < size,
             "Index", index, "out of bounce");
+
+        if (index < 0) {
+            index += size;
+        }
+
+        return index;
     }
 
     template<typename T>
@@ -353,6 +354,16 @@ namespace osh {
         T t = a;
         a = b;
         b = t;
+    }
+
+    template<typename T>
+    T min(T a, T b) {
+        return a < b ? a : b;
+    }
+
+    template<typename T>
+    T max(T a, T b) {
+        return a > b ? a : b;
     }
 }
 
