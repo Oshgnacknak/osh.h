@@ -97,26 +97,16 @@ namespace osh {
     template<Destructible T>
     AutoDestruct<T> autoDestruct(T t);
 
-    class StringBuffer {
-        char* data;
-        int _size = 0;
-        int capacity;
+    class StringBuffer : public DArray<char> {
     public:
-        StringBuffer(int = 10);
+        StringBuffer(size_t = 10);
         StringBuffer(const char*);
-        void destruct();
-        int size() const;
         char* cstr() const;
         template<typename... Args> void format(const char* fmt, Args&&...);
-        void ensureCapacity(int);
-        StringBuffer substr(const int& begin, const int& end) const;
+        StringBuffer substr(ssize_t begin, ssize_t end) const;
         void clear();
-        char& operator[](const int& index);
-        StringBuffer& operator+=(const char&);
+        char& operator[](int index);
     };
-
-    template<typename T>
-    void checkIndex(const T& index, const T& size);
 
     void print1(Formatter auto&, const StringBuffer&);
 
@@ -277,10 +267,6 @@ namespace osh {
         return (AutoDestruct<T>) t;
     }
 
-    StringBuffer::StringBuffer(int capacity) : capacity(capacity) {
-        data = (char*) malloc(capacity);
-        if (capacity > 0) {
-            data[0] = '\0';
 
     template<typename T>
     DArray<T>::DArray(size_t capacity) : capacity(capacity) {
@@ -307,9 +293,6 @@ namespace osh {
         }
     }
 
-    StringBuffer::StringBuffer(const char* data) : StringBuffer(strlen(data)) {
-        _size = capacity;
-        memcpy(this->data, data, _size);
     template<typename T>
     void DArray<T>::push(const T& t) {
         ensureCapacity(1);
@@ -321,27 +304,36 @@ namespace osh {
         size_ = 0;
     }
 
-    int StringBuffer::size() const {
-        return _size;
     template<typename T>
     T& DArray<T>::operator[](ssize_t index) {
         index = listIndex(index, size_);
         return elements[index];
     }
 
+    StringBuffer::StringBuffer(size_t capacity) : DArray(capacity) {
+        if (capacity > 0) {
+            elements[0] = '\0';
+        }
+    }
+
+    StringBuffer::StringBuffer(const char* initial) : DArray(strlen(initial)) {
+        size_ = capacity;
+        memcpy(this->elements, initial, size_);
     }
 
     char* StringBuffer::cstr() const {
-        return data;
+        return elements;
     }
 
-    StringBuffer StringBuffer::substr(const int& begin, const int& end) const {
-        checkIndex(begin, _size);
-        checkIndex(end, _size);
-        assert(begin < end);
+    StringBuffer StringBuffer::substr(ssize_t begin, ssize_t end) const {
+        begin = listIndex(begin, size_);
+        end = listIndex(end, size_);
+        assert(begin <= end);
 
-        StringBuffer s(end - begin);
-        memcpy(s.data, data, s._size);
+        size_t size = end - begin + 1;
+        StringBuffer s(size);
+        s.size_ = size;
+        memcpy(s.elements, elements + begin, size);
 
         return s;
     }
@@ -350,47 +342,21 @@ namespace osh {
     void StringBuffer::format(const char* fmt, Args&&... args) {
         int required = 1 + snprintf(nullptr, 0, fmt, args...);
         ensureCapacity(required);
-        snprintf(data + _size, required, fmt, args...);
-        _size += required;
-    }
-
-    void StringBuffer::ensureCapacity(int required) {
-        capacity = max(capacity *= 2, _size + required);
-        data = (char*) realloc(data, capacity);
+        snprintf(elements + size_, required, fmt, args...);
+        size_ += required;
     }
 
     void StringBuffer::clear() {
-        _size = 0;
+        DArray::clear();
         if (capacity > 0) {
-            data[_size] = '\0';
+            elements[size_] = '\0';
         }
-    }
-
-    void StringBuffer::destruct() {
-        if (data != nullptr) {
-            free(data);
-        }
-    }
-
-    char& StringBuffer::operator[](const int& index) {
-        checkIndex(index, capacity);
-        return data[index];
-    }
-
-    StringBuffer& StringBuffer::operator+=(const char& c) {
-        ensureCapacity(1);
-        data[_size++] = c;
-        data[_size] = '\0';
-        return *this;
     }
 
     void print1(Formatter auto& fmt, const StringBuffer& s) {
         printp(fmt, s.cstr());
     }
 
-    template<typename T>
-    void checkIndex(const T& index, const T& size) {
-        assert(index >= 0 && index < size,
 
     int listIndex(int index, const int& size) {
         assert(index >= -size && index < size,
