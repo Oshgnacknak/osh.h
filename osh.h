@@ -363,7 +363,7 @@ namespace osh {
         int required = 1 + snprintf(nullptr, 0, fmt, args...);
         ensureCapacity(required);
         snprintf(elements + size_, required, fmt, args...);
-        size_ += required;
+        size_ += required - 1;
     }
 
     void print1(Formatter auto& fmt, const StringBuffer& s) {
