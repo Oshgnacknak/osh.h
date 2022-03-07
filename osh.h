@@ -1,6 +1,8 @@
 #ifndef OSH_H
 #define OSH_H 
 
+#define OSH_H_VERSION 1.0
+
 #include <stdio.h>
 
 namespace osh {
