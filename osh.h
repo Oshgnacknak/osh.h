@@ -112,6 +112,8 @@ namespace osh {
 
     void print1(Formatter auto&, const StringBuffer&);
 
+    StringBuffer fileContentAsBuffer(const char* filename);
+
     int listIndex(int index, const int& size);
 
     template<typename T>
@@ -370,6 +372,21 @@ namespace osh {
         printp(fmt, s.cstr());
     }
 
+    StringBuffer fileContentAsBuffer(const char* filename) {
+        FILE* f = fopen(filename, "r");
+        assert(f != NULL);
+
+        fseek(f, 0, SEEK_END);
+        int capacity = ftell(f);
+        StringBuffer s(capacity);
+        
+        rewind(f);
+        int read = fread(s.cstr(), sizeof(char), capacity, f);
+        assert(read == capacity);
+        
+        s.setSize(capacity);
+        return s;
+    }
 
     int listIndex(int index, const int& size) {
         assert(index >= -size && index < size,
