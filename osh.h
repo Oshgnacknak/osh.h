@@ -88,6 +88,8 @@ namespace osh {
         DArray(size_t = 10);
         void destruct();
         size_t size() const;
+        void setSize(size_t);
+        void growToCapacity(size_t);
         void ensureCapacity(size_t);
         void push(const T&);
         void clear();
@@ -104,7 +106,7 @@ namespace osh {
         char* cstr() const;
         template<typename... Args> void format(const char* fmt, Args&&...);
         StringBuffer substr(ssize_t begin, ssize_t end) const;
-        void clear();
+        void setSize(size_t);
         char& operator[](int index);
     };
 
@@ -286,11 +288,22 @@ namespace osh {
     }
 
     template<typename T>
-    void DArray<T>::ensureCapacity(size_t required) {
-        if (size_ + required >= capacity) {
-            capacity = max(capacity *= 2, size_ + required);
+    void DArray<T>::setSize(size_t newSize) {
+        growToCapacity(newSize);
+        size_ = newSize;
+    }
+
+    template<typename T>
+    void DArray<T>::growToCapacity(size_t newCapacity) {
+        if (newCapacity > capacity) {
+            capacity = max(capacity *= 2, newCapacity);
             elements = (T*) realloc(elements, sizeof(T) * capacity);
         }
+    }
+
+    template<typename T>
+    void DArray<T>::ensureCapacity(size_t required) {
+        growToCapacity(size_ + required);
     }
 
     template<typename T>
@@ -301,7 +314,7 @@ namespace osh {
 
     template<typename T>
     void DArray<T>::clear() {
-        size_ = 0;
+        setSize(0);
     }
 
     template<typename T>
@@ -338,19 +351,19 @@ namespace osh {
         return s;
     }
 
+    void StringBuffer::setSize(size_t newSize) {
+        DArray::setSize(newSize);
+        if (capacity > 0) {
+            elements[size_] = '\0';
+        }
+    }
+
     template<typename... Args>
     void StringBuffer::format(const char* fmt, Args&&... args) {
         int required = 1 + snprintf(nullptr, 0, fmt, args...);
         ensureCapacity(required);
         snprintf(elements + size_, required, fmt, args...);
         size_ += required;
-    }
-
-    void StringBuffer::clear() {
-        DArray::clear();
-        if (capacity > 0) {
-            elements[size_] = '\0';
-        }
     }
 
     void print1(Formatter auto& fmt, const StringBuffer& s) {
