@@ -4,7 +4,9 @@ using namespace osh;
 
 int main() {
     StringBuffer sb = fileContentAsBuffer(__FILE__);
-    auto destruct_sb = autoDestruct(sb);
+    Defer destruct_sb([&]() {
+        sb.destruct();
+    });
 
     printp(sb, "\n");
     printp(sb, "void foo() {\n");

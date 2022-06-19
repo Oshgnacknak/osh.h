@@ -1,11 +1,16 @@
 #ifndef OSH_H
 #define OSH_H 
 
-#define OSH_H_VERSION 1.0
+#define OSH_H_VERSION 2.0
 
 #include <stdio.h>
 
 namespace osh {
+
+    template<typename R>
+    concept Runnable = requires(R r) {
+        r();
+    };
 
     template<typename T, typename P>
     concept PrintableTo = requires(T t, P p) {
@@ -67,17 +72,13 @@ namespace osh {
     template<typename... Args>
     void assert(bool condition, Args&&... args);
 
-    template<typename T>
-    concept Destructible = requires(T t) {
-        t.destruct();
-    };
+    template<Runnable R>
+    struct Defer {
+        R defered;
 
-    template<Destructible T>
-    struct AutoDestruct : public T {
-        template<typename... Args>
-        AutoDestruct(Args&&... args);
-
-        ~AutoDestruct();
+    public:
+        Defer(R);
+        ~Defer();
     };
 
     template<typename T>
@@ -97,9 +98,6 @@ namespace osh {
         void clear();
         T& operator[](ssize_t);
     };
-
-    template<Destructible T>
-    AutoDestruct<T> autoDestruct(T t);
 
     class StringBuffer : public DArray<char> {
     public:
@@ -259,20 +257,15 @@ namespace osh {
         }
     }
 
-    template<typename T>
-    template<typename... Args>
-    AutoDestruct<T>::AutoDestruct(Args&&... args) : T(args...) {}
 
-    template<Destructible T>
-    AutoDestruct<T>::~AutoDestruct() {
-        this->destruct();
+    template<Runnable R>
+    Defer<R>::Defer(R runnable)
+        : defered(runnable) {}
+    
+    template<Runnable R>
+    Defer<R>::~Defer() {
+        defered();
     }
-
-    template<Destructible T>
-    AutoDestruct<T> autoDestruct(T t) {
-        return (AutoDestruct<T>) t;
-    }
-
 
     template<typename T>
     DArray<T>::DArray(size_t capacity) : capacity(capacity) {
